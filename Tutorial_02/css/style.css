@@ -1,0 +1,15 @@
+* {
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+  margin: 200px 0 20px;
+  font-size: 25px;
+}
+
+.diamond-blk {
+  display: flex;
+  justify-content: center;
+  
+}
