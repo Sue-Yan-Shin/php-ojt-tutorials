@@ -9,7 +9,7 @@ css/
 ├── reset.css
 └── style.css
 demo/
-└── Tuto_07.png
+└── preview.jpg
 images/
 ├── qr1.png
 ├── qr2.png
@@ -24,4 +24,4 @@ README.md
 - required
 - QR name field is required
 
-![Tuto_07.png](demo/Tuto_07.png)
+![preview.jpg](demo/preview.jpg)

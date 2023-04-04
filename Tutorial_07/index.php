@@ -1,16 +1,7 @@
 <?php
 session_start();
-
 // get all the QR code images from the images folder
-$qrImagePath = glob("images/*.png");
-if (!empty($qrImagePath)) {
-  // add the newly generated image path at the beginning of the array
-  $newImagePath = "images/qr_" . $name . ".png";
-  //array_unshift($qrImagePath, $newImagePath);
-  $qrImagePath = array_merge(array($newImagePath), $qrImagePath);
-
-}
-
+    $qrImages = glob("images/*.png");
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +11,7 @@ if (!empty($qrImagePath)) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Image</title>
+    <title>QR Code Generator</title>
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="libs/bootstrap-5.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -28,12 +19,6 @@ if (!empty($qrImagePath)) {
 
 <body>
     <div class="container d-flex flex-column align-items-center my-5 text-center">
-        <!--<div class="alert py-1 text-center <?php echo $_SESSION['alertColor']; ?> " role="alert" style="width:24rem;">
-            <p>
-              <?php //echo $_SESSION['message'];
-                ?>
-            </p>
-        </div>-->
         <div class="card col-md-4" style="width:24rem;">
             <h4 class="card-header">
                 QR Code Generator
@@ -52,23 +37,33 @@ if (!empty($qrImagePath)) {
             </div>
         </div>
     </div>
-    <?php
-    var_dump( $_SESSION['generatedImg']);
-          echo '<img src=" images/'. $_SESSION['generatedImg'] .'" class="" />';    
-// display the QR code images in a 3-column grid using Bootstrap
-echo '<div class="container w-75 bg-light">';
-echo '<h3 class="m-4">QR List</h3>';
-echo '<div class="row">';
-foreach ($qrImagePath as $qr_image) {
-    echo '<div class="col-sm-4">';
-    echo '<div class="card m-4 w-75 text-center pb-3">';
-    echo '<img src="' . $qr_image . '" class=""  />';
-    echo "<h6> $qr_image </h6>";
-    echo '</div>';
-    echo '</div>';
-}
-echo '</div>';
-echo '</div>';
-?>
+    
+    <div class="col-sm-2 text-center m-auto mb-4">
+    <div class="card text-center <?php echo empty($_SESSION['generatedImg']) ? 'collapse' : '' ?> ">
+        <img src="images/<?php echo $_SESSION['generatedImg']?>   " alt="" style="width:200px;
+        ">
+    </div>
+    </div>
+
+    <div class="card w-75 m-auto">
+        <h3 class="card-header">QR List</h3>
+        <div class="card-body row">
+            <?php
+              foreach ($qrImages as $qr_image) {
+                echo '<div class="col-sm-4">';
+                echo '<div class="card m-4 w-75 text-center pb-3">';
+                echo '<img src="' . $qr_image . '" />';
+                echo "<h6> $qr_image</h6>";
+                echo '</div>';
+                echo '</div>';
+            }
+            ?>
+        </div>
+    </div>
 </body>
+
 </html>
+<?php
+unset($_SESSION['qrNameError']);
+unset($_SESSION['generatedImg']);
+?>
