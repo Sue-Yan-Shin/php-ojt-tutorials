@@ -6,7 +6,8 @@ require "libs/phpqrcode/qrlib.php";
 if (isset($_POST['generate'])) {
     // get the input from the user
     $name = $_POST["qrName"];
-
+    //old value
+    $_SESSION['qrName'] = $name;
     if (!empty($name)) {
         if (file_exists('images/' . $name . '.png')) {
             $_SESSION['qrNameError'] = "QR name already existed.";
@@ -15,7 +16,6 @@ if (isset($_POST['generate'])) {
         }
         // generate the QR code
         $_SESSION['generatedImg'] = $name . ".png";
-        //$file_path="images/".$file_name;
         QRcode::png($name, "images/" . $_SESSION['generatedImg']);
         header('Location: index.php');
     } else {

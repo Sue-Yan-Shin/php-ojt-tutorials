@@ -12,29 +12,38 @@ function readTxtFile()
     return $txtContent;
 }
 /**
- * readDocFile function
+ * readWord function
  *
+ * @param string $filename
  * @return string
  */
-function readDocFile()
+function readWord($filename)
 {
-    $filename = "files/sample.doc";
-    $docReader = \PhpOffice\PhpWord\IOFactory::createReader('MsDoc');
-    $phpWord = $docReader->load($filename);
+    if (file_exists($filename)) {
+        if (($fh = fopen($filename, 'r')) !== false) {
+            $headers = fread($fh, 0xA00);
 
-    $sections = $phpWord->getSections();
-    $text = "";
-    foreach ($sections as $section) {
-        $elements = $section->getElements();
+            // 1 = (ord(n)*1) ; Document has from 0 to 255 characters
+            $n1 = (ord($headers[0x21C]) - 1);
 
-        foreach ($elements as $element) {
-            if ($element instanceof \PhpOffice\PhpWord\Element\Text) {
-                $text .= $element->getText();
-            }
+            // 1 = ((ord(n)-8)*256) ; Document has from 256 to 63743 characters
+            $n2 = ((ord($headers[0x21D]) - 8) * 256);
+
+            // 1 = ((ord(n)*256)*256) ; Document has from 63744 to 16775423 characters
+            $n3 = ((ord($headers[0x21E]) * 256) * 256);
+
+            // 1 = (((ord(n)*256)*256)*256) ; Document has from 16775424 to 4294965504 characters
+            $n4 = (((ord($headers[0x21F]) * 256) * 256) * 256);
+
+            // Total length of text in the document
+            $textLength = ($n1 + $n2 + $n3 + $n4);
+
+            $extracted_plaintext = fread($fh, $textLength);
+            return nl2br($extracted_plaintext);
         }
     }
-    return $text;
 }
+
 /**
  * readExcelFile function
  *
@@ -65,31 +74,32 @@ function readExcelFile()
 /**
  * readCsvFile function
  *
+ * @param string $filename
  * @return string
  */
-function readCsvFile()
+function readCsvFile($filename)
 {
-    $filename = 'files/sample.csv';
+    $html = '';
     if (($handle = fopen($filename, 'r')) !== false) {
         $headers = fgetcsv($handle); // Read the header row
-        $data = array();
+        $html  = '<table class="table">';
+        $html .= '<tr>';
+        foreach ($headers as $header) {
+            $html .= '<th>' . $header . '</th>';
+        }
+        $html .= '</tr>';
         while (($row = fgetcsv($handle)) !== false) {
-            $data[] = array_combine($headers, $row); // Combine header row with data rows
+            $html .= '<tr>';
+            foreach ($row as $value) {
+                $html .= '<td>' . $value . '</td>';
+            }
+            $html .= '</tr>';
         }
         fclose($handle);
-        // Output the table header
-        $html  = '<table class="table">';
-        $html .= '<tr><th>' . implode('</th><th>', $headers) . '</th></tr>';
-        // Loop through the data array and output each row
-        foreach ($data as $row) {
-            $html .= '<tr><td>' . implode('</td><td>', $row) . '</td></tr>';
-        }
-        // Output the table footer
         $html .= '</table>';
     }
     return $html;
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -118,7 +128,7 @@ function readCsvFile()
             <h1 class="fs-3">Document File</h1>
             <hr>
             <?php
-            echo readDocFile();
+            echo readWord('files/sample.doc');
             ?>
         </div>
         <div class="excel-file mb-5">
@@ -132,7 +142,7 @@ function readCsvFile()
             <h1 class="fs-3">CSV File</h1>
             <hr>
             <?php
-            echo readCsvFile();
+            echo readCsvFile('files/sample.csv');
             ?>
         </div>
     </div>

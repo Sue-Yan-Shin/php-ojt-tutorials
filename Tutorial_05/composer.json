@@ -1,7 +1,5 @@
 {
     "require": {
-        "phpoffice/phpexcel": "^1.8",
-        "phpoffice/phpword": "^1.0",
         "phpoffice/phpspreadsheet": "^1.28"
     }
 }
